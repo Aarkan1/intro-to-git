@@ -1,4 +1,4 @@
-Teacher outlines Part 1
+Teacher outlines
 
 - [Version Control: What and why?](#version-control-what-and-why)
   - [What is version control?](#what-is-version-control)
@@ -11,22 +11,20 @@ Teacher outlines Part 1
   - [What just happened?](#what-just-happened)
 - [Basic Operations](#basic-operations)
   - [Adding and Committing](#adding-and-committing)
+  - [git status](#git-status)
   - [Adding new files](#adding-new-files)
   - [Committing changes](#committing-changes)
+  - [Committing with description](#committing-with-description)
   - [Directories](#directories)
-  - [git status](#git-status)
-  - [.gitignore](#gitignore)
   - [git diff](#git-diff)
   - [git log](#git-log)
   - [git show](#git-show)
   - [Deleting files](#deleting-files)
   - [Moving files](#moving-files)
-- [A Peek Inside Git](#a-peek-inside-git)
-  - [SHA-1 Hashes](#sha-1-hashes)
-  - [Writing SHA-1 Hashes](#writing-sha-1-hashes)
-  - [Why not a revision number?](#why-not-a-revision-number)
-  - [The DAG](#the-dag)
-  - [And that's Git!](#and-thats-git)
+  - [.gitignore](#gitignore)
+- [More on staging](#more-on-staging)
+  - [Unstaging](#unstaging)
+  - [Stage just some changes in a file](#stage-just-some-changes-in-a-file)
 - [Local Branching and Merging](#local-branching-and-merging)
   - [Creating and listing branches](#creating-and-listing-branches)
   - [Switching to a branch](#switching-to-a-branch)
@@ -40,6 +38,27 @@ Teacher outlines Part 1
   - [Merge commits](#merge-commits)
   - [gitk](#gitk)
   - [Coping with conflicts](#coping-with-conflicts)
+- [Branch Workflows](#branch-workflows)
+- [The Stash](#the-stash)
+  - [What is the stash?](#what-is-the-stash)
+  - [When to stash?](#when-to-stash)
+  - [Stashing just unstaged stuff](#stashing-just-unstaged-stuff)
+- [Getting Distributed](#getting-distributed)
+  - [Remotes](#remotes)
+  - [A central repository](#a-central-repository)
+  - [Hosted Git](#hosted-git)
+  - [This course: GitHub](#this-course-github)
+  - [Add a SSH-key to Github](#add-a-ssh-key-to-github)
+  - [Adding a remote](#adding-a-remote)
+  - [The first push](#the-first-push)
+  - [Cloning](#cloning)
+  - [Sharing changes](#sharing-changes)
+  - [Getting the latest changes](#getting-the-latest-changes)
+  - [When pulling gets tricky](#when-pulling-gets-tricky)
+  - [When pushing gets tricky](#when-pushing-gets-tricky)
+- [Pull Requests](#pull-requests)
+- [Closing Remarks](#closing-remarks)
+  - [Remember](#remember)
 
 ---
 
@@ -132,46 +151,6 @@ In Git, committing is a two-step process
 1. Add things into the staging area
 2. Commit what's in the staging area
 
-### Adding new files
-
-The `add` command places a file in the staging area
-
-`$ git add README`
-
-The `commit` command then takes the contents of the staging area, and creates a commit
-
-`$ git commit -m "Add a README"`
-
-```git
-[master (root-commit) beb9dfd] Add a README.
- 1 files changed, 1 insertions(+), 0 deletions(-)
- create mode 100644 README
-```
-
-### Committing changes
-
-With existing files, _`add` places the changes to that file into the staging area_. This means that you can commit changes with the following two commands:
-
-`$ git add README`
-
-`$ git commit -m "Update README"`
-
-Usually, however, this is done just with `commit`, specifying the file(s) to be committed:
-
-`$ git commit -m "Update README" README`
-
-### Directories
-
-If you use `add` with a file inside a directory, it will retain the directory structure
-
-`$ git add src/main.js`
-
-`$ git commit -m "Start le coding!"`
-
-_There is only one .git at the top level of the repository, not one inside every directory._
-
-_**Minor limitation**: Git doesn't support putting empty directories under version control._
-
 ### git status
 
 Gives an overview of what is currently staged, changed in tracked files and untracked.
@@ -213,32 +192,69 @@ Let's add one file and look at the status again...
 #       src/styles.css
 ```
 
-### .gitignore
+### Adding new files
 
-One annoyance is that after building our code, the generated files show up in the status output.
+The `add` command places a file in the staging area
+
+`$ git add README`
+
+The `commit` command then takes the contents of the staging area, and creates a commit
+
+`$ git commit -m "Add a README"`
 
 ```git
-# On branch master
-# Untracked files:
-#
-#       main.exe
-#       main.obj
-#       util.jar
+[master (root-commit) beb9dfd] Add a README.
+ 1 files changed, 1 insertions(+), 0 deletions(-)
+ create mode 100644 README
 ```
 
-The solution is to add a .gitignore file.
+### Committing changes
 
-**.gitignore**
+With existing files, _`add` places the changes to that file into the staging area_. This means that you can commit changes with the following two commands:
 
+`$ git add README`
+
+`$ git commit -m "Update README"`
+
+Usually, however, this is done just with `commit`, specifying the file(s) to be committed:
+
+`$ git commit -m "Update README" README`
+
+### Committing with description
+
+If you want to add more text you can create the commit with a text editor.
+
+`$ git commit`
+
+Though not required, it’s a good idea to begin the commit message with a single short (less than 50 characters).
+
+The first row is the commit title. The description is written with a blank line between the title.
+
+The description has no restriction on the length.
+
+```git
+The commit title (max 50 characters)
+
+The description...
 ```
-*.exe
-*.obj
-*.jar
-```
 
-`$ git add .gitignore`
+On some systems the default editor is vim. You can change editor with the following command:
 
-`$ git commit -m "Add a .gitignore"`
+`$ git config --global core.editor nano`
+
+nano is a simple text editor within the terminal.
+
+### Directories
+
+If you use `add` with a file inside a directory, it will retain the directory structure
+
+`$ git add src/main.js`
+
+`$ git commit -m "Start le coding!"`
+
+_There is only one .git at the top level of the repository, not one inside every directory._
+
+_**Minor limitation**: Git doesn't support putting empty directories under version control._
 
 ### git diff
 
@@ -388,81 +404,62 @@ Or move it with your OS or IDE, and `git add` the new file; Git will figure out 
 
 `$ git commit -m "Rename the program" src`
 
-## A Peek Inside Git
+### .gitignore
 
-### SHA-1 Hashes
-
-Every commit is identified by a SHA-1 hash; we came across these when using log and show.
+One annoyance is that after building our code, the generated files show up in the status output.
 
 ```git
-commit e20962ebed7b0288922320f217a6a3ab9371727c  <-- Full hash of the commit
-Author: johan <johan@edument.se>
-Date:   Wed Apr 18 18:09:02 2012 +0200
-
-    Add a .gitignore
+# On branch master
+# Untracked files:
+#
+#       main.exe
+#       main.obj
+#       util.jar
 ```
 
-The hash is _derived from the content of the commit_ along with the commit that came before it.
+The solution is to add a .gitignore file.
 
-This means that the SHA-1 is not only unique locally, but _unique over all copies of a repository_!
-
-### Writing SHA-1 Hashes
-
-We have also seen SHA-1 hashes show up in an _abbreviated form_:
-
-```git
-e20962e Add a .gitignore
-eae16e7 Factor printing out to a utility file
-887f06c Start le coding!
-869cec3 Update README
-8356287 Add a README
-```
-
-Usually, the first six characters are enough to uniquely identify a commit in a repository.
-
-You can provide as few or as many characters as you wish, provided they identify a single commit.
-
-### Why not a revision number?
-
-Using numbers would imply there is one unique ordering of commits.
-
-This is fine if you have a centralized version control system, since the server can decide who gets to commit first if there is competition.
-
-This doesn't make any sense in a distributed world, where different local copies will have commits that have not been shared yet.
-
-_SHA-1 is always content-unique._
-
-### The DAG
-
-The version history is represented by a DAG (Directed Acyclic Graph) of commits.
-
-Each commit points to the commit that came before it (or “commits” when there is a merge)
+**.gitignore**
 
 ```
-    *                   *
-    |                  /|
-    *                 * |
-    |                 | |
-    *                 * *
-    |                 | |
-
-simple,             with a merge
-linear case         commit
+*.exe
+*.obj
+*.jar
 ```
 
-### And that's Git!
+`$ git add .gitignore`
 
-Just about everything in Git boils down to...
+`$ git commit -m "Add a .gitignore"`
 
-a. Commits that are identified by a SHA-1
+## More on staging
 
-b. Manipulating the DAG of commits
+### Unstaging
 
-The rest of this course will show you a whole array of different commands and patterns.
+Put something into the staging area, then realize you really didn't want to do that?
 
-However, everything we will cover is really just about commits and placing them in graphs.
+To unstage everything (such that it will be considered as an untracked modification), just do:
 
-_The underlying model of Git is simple ☺_
+`$ git reset`
+
+You can also unstage an individual file:
+
+`$ git reset -- README`
+
+### Stage just some changes in a file
+
+In the mess of development, you did two changes together and you want to commit just one of them.
+
+Unfortunately, the two changes are in the same file.
+
+Thankfully, git lets you stage just some of a file's changes!
+
+`$ git add -p lib/Text/BarGraph.pm`
+
+You can get a more graphical experience of this using:
+
+`$ git gui`
+
+Or any distributed gui client: https://git-scm.com/downloads/guis
 
 ## Local Branching and Merging
 
@@ -783,3 +780,315 @@ We have to inform Git that we have resolved the conflict to our satisfaction; th
 At this point, the `commit` command can be issued, and this time it will be successful.
 
 `$ git commit -m "Merge in feature"`
+
+## Branch Workflows
+
+https://nvie.com/posts/a-successful-git-branching-model/
+
+![](https://nvie.com/img/git-model@2x.png)
+
+https://trunkbaseddevelopment.com/
+
+![](https://trunkbaseddevelopment.com/trunk1c.png)
+
+## The Stash
+
+### What is the stash?
+
+The stash is a place you can keep changes you're working on, but do not yet wish to commit.
+
+Performing a stash pushes your current modifications onto the stash, and gives you a clean working tree.
+
+`$ git stash`
+
+You can get them back later by popping the stash:
+
+`$ git stash pop`
+
+### When to stash?
+
+When you've been working on some changes, then realize you're in the wrong branch...
+
+`$ git stash`
+
+`$ git checkout the-right-branch`
+
+`$ git stash pop`
+
+When you realize you want to do something else (maybe a refactor) then resume your current work.
+
+When you have uncommitted changes, but want to pull.
+
+### Stashing just unstaged stuff
+
+You've done two changes at once. You've managed to get just one of them staged for commit...then you realize a test now fails. You want to try them in isolation.
+
+By default, stash will stash away anything you have already staged. However, you can tell it not to...
+
+`$ git stash --keep-index`
+
+(Note that the index is another name for the staging area. The two are used interchangeably.)
+
+## Getting Distributed
+
+### Remotes
+
+Earlier on, it was mentioned that you can copy a Git repository, complete with history, by copying the contents of the .git directory.
+
+_A remote is another copy of the current repository._
+
+It may have some commits we don't have.
+
+It may lack some commits we have.
+
+_It should always be possible to trace back from the current latest commits locally and in the remote to a common ancestor._
+
+### A central repository
+
+The most common use of remotes is to set up a central repository.
+
+```git
+                Central
+               Repository
+              /    |    \
+            /      |      \
+          /        |        \
+  Dave the     Tatyana the    Bob the
+  Developer      Tester     Build Manager
+```
+
+It's the central repository because everyone agrees it is. To Git, it's just another copy.
+
+### Hosted Git
+
+There are a range of hosted Git services out there, which can host your central repository for you.
+
+_GitHub_ is the largest today, offering free hosting for public repositories (used by thousands of open source projects) and private hosting for individuals and organizations.
+
+_Azure devops_.
+
+_Bitbucket_ is widely used in the Atlassian family. (Jira, Confluence, etc)
+
+_Gitourious_ is a lesser known alternative; some projects have chosen it over GitHub.
+
+_You can also host it yourself, with a bit of setup._
+
+### This course: GitHub
+
+We'll use repositories on GitHub for the purpose of practicing with remotes.
+
+_All of the commands and techniques we learn are completely transferable to working with any other remote, whether hosted internally or elsewhere._
+
+Having a GitHub account also opens the door to contributing to thousands of open source projects; it may well come in useful to you far beyond this course. ☺
+
+### Add a SSH-key to Github
+
+When working with a remote you always have to authorize the push/pull.
+
+It can get rather tedious having to login with a password all the time.
+
+The recommended thing to do is to add your public rsa_id key to your Github profile.
+
+Create a rsa_id key with the command:
+
+`ssh-keygen -t rsa -b 4096`
+
+A couple of rsa files will be created in your .ssh directory in your home folder.
+
+Mac/Linux: `~/.ssh`
+
+Windows: `C:\Users\[your-user-name]\.ssh`
+
+In your Github profile settings go to **SSH and GPG keys** and click the **"New SSH key"** button. Add your **id_rsa.pub** content here.
+
+### Adding a remote
+
+After creating a repository on GitHub, we need to tell our local Git repository about it by adding it as a remote.
+
+Be sure that you copy the SSH url.
+
+`$ git remote add origin git@github.com:user/repo.git`
+
+Since you can have multiple remotes, you have to specify a name as well as the address.
+
+The convention used by almost all Git users is to call the central repository remote _origin_.
+
+### The first push
+
+Pushing is taking commits we have locally and copying them to a remote.
+
+If we have a new, empty, central repository then our first push should use the `-u` flag.
+
+`$ git push -u origin master`
+
+```git
+Dave the Dev       Central
+     * - HEAD         * - HEAD
+     |   --------->   |
+     *                *
+```
+
+### Cloning
+
+The `clone` command is used when you want to get a local copy of a remote repository; it also sets up origin to point to the remote for you.
+
+`$ git clone git@github.com:user/repo.git`
+
+```git
+  Central      Norbert the New Guy
+     * - HEAD         * - HEAD
+     |   --------->   |
+     *                *
+```
+
+**You use clone once to get an initial copy of the remote; later you'll be using pull to synchronize.**
+
+### Sharing changes
+
+After you have done some work locally, you will have one or more commits that the central repository does not have.
+
+```git
+Dave the Dev       Central
+     * - HEAD
+     |
+     *                * - HEAD
+     |                |
+     *                *
+```
+
+In this case, we need to copy the one extra, new commit over to the central server.
+
+The push command is used to do this:
+
+`$ git push origin master`
+
+```git
+Dave the Dev       Central
+     * - HEAD         * - HEAD
+     |                |
+     *    ------->    *
+     |                |
+     *                *
+```
+
+You don't need to tell Git which commit(s) it needs to copy. It always works that out for you. ☺
+
+### Getting the latest changes
+
+At this point, the central repository has a commit that Norbert the New Guy doesn't have in his local copy of the repository.
+
+```git
+  Central      Norbert the New Guy
+     * - HEAD
+     |
+     *                * - HEAD
+     |                |
+     *                *
+```
+
+We need to copy that new commit from the central repository into the local copy.
+
+The `pull` command is used to `fetch` the latest changes and `merge` them into our local copy.
+
+`$ git pull`
+
+```git
+  Central      Norbert the New Guy
+     * - HEAD         * - HEAD
+     |                |
+     *    ------->    *
+     |                |
+     *                *
+```
+
+`pull` really just calls two other commands for us:
+
+`fetch`
+This command fetches all of the changes from a remote that we don't know about locally.
+
+`merge`
+We already saw this one! ☺
+
+The exact same mechanism we used to merge local branches is also used to merge commits from a remote. Neat, huh? ☺
+
+### When pulling gets tricky
+
+Since a pull involves a merge, all of the cases of merging we saw earlier can come up again.
+
+`Fast-forward`
+If you have no local commits, you always get a straightforward fast-forward merge.
+
+`Merge Commit`
+When you have local commits and also bring in remote ones, the DAG looks just as it does in a branch situation. A merge commit is needed. Sometimes, manual intervention may be needed.
+
+### When pushing gets tricky
+
+Sometimes, both you and the remote repository may have extra commits.
+
+```git
+  Central      Norbert the New Guy
+     * - HEAD         * - HEAD
+     |                |
+     *                *
+     |                |
+     *                *
+     |                |
+     *                *
+```
+
+If Norbert tries to push, it will fail.
+
+`$ git push origin master`
+
+```git
+  Central      Norbert the New Guy
+     * - HEAD         * - HEAD
+     |                |
+     *                *
+     |                |
+     *    <---X---    *
+     |                |
+     *                *
+```
+
+The solution is to pull first.
+
+`$ git pull`
+
+This will result in a merge commit being created locally; we then push it along with our commit.
+
+`$ git push origin master`
+
+The underlying principle here is that all merging takes place locally, and you push the results of the merge.
+
+## Pull Requests
+
+When a team grows it's a bad idea to merge branches directly.
+
+Unchecked code might get merged, and a lot conflicts will arise.
+
+A pull request is a merge in waiting - waiting to be reviewed and approved before merging.
+
+This pull request is a great place to discuss code practices, and highlight parts that's good, or might add technical dept.
+
+It should have a good description, and if working with a gui component it would be good with a screenshot of the implemented feature.
+
+It's also motivating to check off pull requests as complete, and it helps notify others that changes are inbounds.
+
+## Closing Remarks
+
+**Branching is lightweight, natural and cheap** - both in terms of branch creation and especially thanks to efficient merging.
+
+Working locally makes things fast.
+
+**More complex workflows can be implemented** since all copies of a repository are on an equal footing; you give them their place and value.
+
+### Remember
+
+In the end, it's all about commits and the DAG.
+
+**Branches are a central part of effective Git usage**. It's better to create a branch you then merge right away, than to not create one and wish you had.
+
+**Rebasing and amending commits** are powerful techniques - but you must only apply them to local history that has not been shared.
+
+Look at your desired development process, and **shape your Git usage** around it - it's malleable!

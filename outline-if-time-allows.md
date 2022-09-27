@@ -1,7 +1,18 @@
-Teacher outlines Part 3
+Teacher outlines
 
 This part is optional if time allows.
 
+- [Rebasing](#rebasing)
+  - [Re-writing history](#re-writing-history)
+  - [git rebase](#git-rebase)
+  - [Pulling with rebasing](#pulling-with-rebasing)
+  - [Amending commits](#amending-commits)
+- [A Peek Inside Git](#a-peek-inside-git)
+  - [SHA-1 Hashes](#sha-1-hashes)
+  - [Writing SHA-1 Hashes](#writing-sha-1-hashes)
+  - [Why not a revision number?](#why-not-a-revision-number)
+  - [The DAG](#the-dag)
+  - [And that's Git!](#and-thats-git)
 - [Tags](#tags)
   - [Two types of tag](#two-types-of-tag)
   - [Creating tags](#creating-tags)
@@ -27,6 +38,172 @@ This part is optional if time allows.
   - [Exploring with cat-file](#exploring-with-cat-file)
 
 ---
+
+## Rebasing
+
+### Re-writing history
+
+When working with Git and you have remotes, your version history falls into two categories.
+
+```git
+    *       History consisting of
+    |       commits you have made
+    *       locally, but have never
+    |       pushed to a remote
+    *  *
+_____\_|_________________________________
+       *
+       |    History that you share with
+       *    others, e.g. that you have
+       |    pushed to or pulled from a remote.
+       *
+```
+
+Since nobody has seen your local commits, you are free to manipulate that part of the history without causing any problems.
+
+**Very Important Warning**
+You must be very careful to never change history that you have already shared. **The big hint you've got it wrong is that a push will fail, and Git will suggest using --force. DO NOT DO THIS**; you will cause problems for others.
+
+### git rebase
+
+You started a branch to work on a feature, and have made a few commits. Then you switched back to master to do a bug fix. You pushed the bug fix, and now return to your feature branch.
+
+```git
+                            *
+Your work on the feature    |       On the other hand, the bug
+branch is local -           *       fix is now pushed;
+you did not                 |       it is shared history
+push it to a remote         *   *
+                              \ |
+                                *
+```
+
+A couple of things are now less than ideal...
+
+Your feature branch is missing the bug fix ☹
+You'd really like to have the bug fix in your branch too; it may affect your feature, and you'd like to be able to test the two in combination.
+
+You won't be able to do a fast-forward merge ☹
+This isn't a huge problem, but merge commits do create a little clutter in the version history; many Git users prefer fast-forward merges.
+
+The `rebase` command can help here. In the feature branch, we can run:
+
+`$ git rebase master`
+
+In a rebase, Git takes the commits in your branch, then "replays" them as if the branch had started at the master branch's current commit, so it has all master does and can fast-forward!
+
+```git
+ before          after
+                   *
+                   |
+    *              *
+    |              |
+    *              *
+    |                \
+    *   *             *
+      \ |             |
+        *             *
+```
+
+### Pulling with rebasing
+
+We've seen that merge commits can also appear when you have local commits, then pull commits from a remote repository.
+
+It is often desirable to avoid these merge commits; pulling is such a common scenario that this will quickly clutter the history.
+
+Thankfully, it's as simple as:
+
+`$ git pull --rebase`
+
+### Amending commits
+
+Ever made a commit...then instantly realized it had a mistake - perhaps even in the commit message?
+
+Provided you did not push the commit, this is easy to fix locally; correct any files, and then use the amend flag:
+
+`$ git commit --amend -m "New message"`
+
+This will take the previous commit, incorporate the current changes into it, and use the new commit message you specify also; omit the commit message to be prompted to stick with the original one.
+
+If you want to use the previous message you can use the `no-edit` flag:
+
+`$ git commit --amend --no-edit`
+
+## A Peek Inside Git
+
+### SHA-1 Hashes
+
+Every commit is identified by a SHA-1 hash; we came across these when using log and show.
+
+```git
+commit e20962ebed7b0288922320f217a6a3ab9371727c  <-- Full hash of the commit
+Author: johan <johan@edument.se>
+Date:   Wed Apr 18 18:09:02 2012 +0200
+
+    Add a .gitignore
+```
+
+The hash is _derived from the content of the commit_ along with the commit that came before it.
+
+This means that the SHA-1 is not only unique locally, but _unique over all copies of a repository_!
+
+### Writing SHA-1 Hashes
+
+We have also seen SHA-1 hashes show up in an _abbreviated form_:
+
+```git
+e20962e Add a .gitignore
+eae16e7 Factor printing out to a utility file
+887f06c Start le coding!
+869cec3 Update README
+8356287 Add a README
+```
+
+Usually, the first six characters are enough to uniquely identify a commit in a repository.
+
+You can provide as few or as many characters as you wish, provided they identify a single commit.
+
+### Why not a revision number?
+
+Using numbers would imply there is one unique ordering of commits.
+
+This is fine if you have a centralized version control system, since the server can decide who gets to commit first if there is competition.
+
+This doesn't make any sense in a distributed world, where different local copies will have commits that have not been shared yet.
+
+_SHA-1 is always content-unique._
+
+### The DAG
+
+The version history is represented by a DAG (Directed Acyclic Graph) of commits.
+
+Each commit points to the commit that came before it (or “commits” when there is a merge)
+
+```
+    *                   *
+    |                  /|
+    *                 * |
+    |                 | |
+    *                 * *
+    |                 | |
+
+simple,             with a merge
+linear case         commit
+```
+
+### And that's Git!
+
+Just about everything in Git boils down to...
+
+a. Commits that are identified by a SHA-1
+
+b. Manipulating the DAG of commits
+
+The rest of this course will show you a whole array of different commands and patterns.
+
+However, everything we will cover is really just about commits and placing them in graphs.
+
+_The underlying model of Git is simple ☺_
 
 ## Tags
 
